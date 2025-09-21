@@ -2,6 +2,7 @@
   "name": "react-login-routing",
   "version": "1.0.0",
   "scripts": {
+    "prepare": "chmod +x node_modules/.bin/vite || true",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
