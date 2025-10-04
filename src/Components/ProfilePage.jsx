@@ -1,172 +1,175 @@
-// src/Pages/ProfilePage.jsx
 import React, { useEffect, useState } from "react";
-import DashboardLayout from "../Pages/DashboardLayout";
+
+const mockProfiles = {
+  admin: {
+    id: "1",
+    name: "Alice Admin",
+    phone: "123-456-7890",
+    department: "Administration",
+    joinDate: "2020-01-15",
+    photoURL: "https://i.pravatar.cc/150?img=1",
+    role: "Admin",
+  },
+  hr: {
+    id: "2",
+    name: "Henry HR",
+    phone: "987-654-3210",
+    department: "Human Resources",
+    joinDate: "2019-05-23",
+    photoURL: "https://i.pravatar.cc/150?img=2",
+    role: "HR",
+  },
+  employee: {
+    id: "3",
+    name: "Emma Employee",
+    phone: "555-123-4567",
+    department: "Development",
+    joinDate: "2021-08-10",
+    photoURL: "https://i.pravatar.cc/150?img=3",
+    role: "Employee",
+  },
+};
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
-  const [requests, setRequests] = useState([]);
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    department: "",
+    joinDate: "",
+    photoURL: "",
+  });
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    // Get logged in user
-    const loggedUser = JSON.parse(localStorage.getItem("user"));
-    const allUsers = JSON.parse(localStorage.getItem("users")) || [];
-    const allRequests = JSON.parse(localStorage.getItem("leaveRequests")) || [];
-
-    if (loggedUser) {
-      const fullUser = allUsers.find((u) => u.email === loggedUser.email);
-      if (fullUser) {
-        setUser(fullUser);
-        setName(fullUser.name || "");
-        setEmail(fullUser.email);
-        setRole(fullUser.role);
-      }
-
-      // Filter this user's leave requests
-      const myRequests = allRequests.filter(
-        (req) => req.email === loggedUser.email
-      );
-      setRequests(myRequests);
+    // Simulate retrieving logged-in user from localStorage
+    const savedUser = JSON.parse(localStorage.getItem("user"));
+    if (savedUser && savedUser.role) {
+      setUser(savedUser);
+      const profile = mockProfiles[savedUser.role.toLowerCase()] || mockProfiles.employee;
+      setFormData({
+        name: profile.name,
+        phone: profile.phone,
+        department: profile.department,
+        joinDate: profile.joinDate,
+        photoURL: profile.photoURL,
+      });
+    } else {
+      setUser(null);
+      setFormData({
+        name: "",
+        phone: "",
+        department: "",
+        joinDate: "",
+        photoURL: "",
+      });
     }
   }, []);
 
-  const handleUpdate = (e) => {
-    e.preventDefault();
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const updatedUsers = users.map((u) =>
-      u.email === user.email ? { ...u, name } : u
-    );
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-
-    // Update local logged-in user info
-    localStorage.setItem("user", JSON.stringify({ email, role }));
-    setMessage("✅ Profile updated successfully!");
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  if (!user) return <DashboardLayout><p>Loading profile...</p></DashboardLayout>;
+  const handleSave = (e) => {
+    e.preventDefault();
+    if (!formData.name) {
+      setMessage("Name is required.");
+      return;
+    }
+    // In a real app, save the formData to backend here
+    setMessage("Profile updated successfully (mock).");
+  };
 
-  // Stats
-  const totalRequests = requests.length;
-  const pending = requests.filter((r) => r.status === "Pending").length;
-  const approved = requests.filter((r) => r.status === "Approved").length;
-  const rejected = requests.filter((r) => r.status === "Rejected").length;
+  if (!user) {
+    return <p className="text-gray-400 text-center py-10">No user logged in.</p>;
+  }
 
   return (
-    <DashboardLayout>
-      <h1 className="text-3xl font-bold mb-6">My Profile & Dashboard</h1>
-
-      {message && <p className="text-green-400 mb-4">{message}</p>}
-
-      {/* Profile Info */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <form
-          onSubmit={handleUpdate}
-          className="space-y-4 bg-white/10 p-6 rounded-lg"
-        >
-          <h2 className="text-xl font-semibold mb-2">Profile Information</h2>
-
-          <div>
-            <label className="block text-sm mb-1">Full Name</label>
-            <input
-              type="text"
-              className="w-full px-4 py-2 rounded bg-white/10 border border-white/30 text-white"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">Email</label>
-            <input
-              type="email"
-              className="w-full px-4 py-2 rounded bg-white/10 border border-white/30 text-white"
-              value={email}
-              disabled
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">Role</label>
-            <input
-              type="text"
-              className="w-full px-4 py-2 rounded bg-white/10 border border-white/30 text-white"
-              value={role}
-              disabled
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
-          >
-            Update Profile
-          </button>
-
-          <div className="text-right mt-2">
-            <a
-              href="/reset-password"
-              className="text-indigo-400 hover:underline"
-            >
-              Change Password
-            </a>
-          </div>
-        </form>
-
-        {/* Quick Stats */}
-        <div className="bg-white/10 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">My Leave Stats</h2>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div className="bg-white/10 p-4 rounded">
-              <p className="text-lg font-bold">{totalRequests}</p>
-              <p className="text-gray-300 text-sm">Total Requests</p>
-            </div>
-            <div className="bg-white/10 p-4 rounded">
-              <p className="text-lg font-bold">{pending}</p>
-              <p className="text-gray-300 text-sm">Pending</p>
-            </div>
-            <div className="bg-green-600/50 p-4 rounded">
-              <p className="text-lg font-bold">{approved}</p>
-              <p className="text-gray-100 text-sm">Approved</p>
-            </div>
-            <div className="bg-red-600/50 p-4 rounded">
-              <p className="text-lg font-bold">{rejected}</p>
-              <p className="text-gray-100 text-sm">Rejected</p>
-            </div>
-          </div>
+    <div className="max-w-3xl mx-auto bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#020617] p-8 rounded-xl shadow-lg text-white">
+      <h1 className="text-4xl font-extrabold mb-6">My Profile ({user.role})</h1>
+      {message && (
+        <p className={`mb-6 ${message.startsWith("Error") ? "text-red-500" : "text-green-400"}`}>
+          {message}
+        </p>
+      )}
+      <form onSubmit={handleSave} className="space-y-6">
+        {/* form inputs same as before */}
+        <div>
+          <label htmlFor="name" className="block mb-1 font-semibold">
+            Name
+          </label>
+          <input
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
+          />
         </div>
-      </div>
+        {/* more fields: phone, department, joinDate, photoURL (same as your original code) */}
+        {/* Phone */}
+        <div>
+          <label htmlFor="phone" className="block mb-1 font-semibold">
+            Phone
+          </label>
+          <input
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+        {/* Department */}
+        <div>
+          <label htmlFor="department" className="block mb-1 font-semibold">
+            Department
+          </label>
+          <input
+            id="department"
+            name="department"
+            value={formData.department}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+        {/* Join Date */}
+        <div>
+          <label htmlFor="joinDate" className="block mb-1 font-semibold">
+            Join Date
+          </label>
+          <input
+            id="joinDate"
+            name="joinDate"
+            type="date"
+            value={formData.joinDate}
+            onChange={handleChange}
+            className="w-full px-4 py-2 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+        {/* Photo URL */}
+        <div>
+          <label htmlFor="photoURL" className="block mb-1 font-semibold">
+            Photo URL
+          </label>
+          <input
+            id="photoURL"
+            name="photoURL"
+            value={formData.photoURL}
+            onChange={handleChange}
+            placeholder="https://example.com/photo.jpg"
+            className="w-full px-4 py-2 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
 
-      {/* Recent Leave Requests */}
-      <div className="bg-white/10 p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Recent Leave Requests</h2>
-        {requests.length === 0 ? (
-          <p className="text-gray-400">No leave requests submitted yet.</p>
-        ) : (
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-gray-600">
-                <th className="py-2">Reason</th>
-                <th className="py-2">Status</th>
-                <th className="py-2">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {requests.map((req) => (
-                <tr key={req.id} className="border-b border-gray-700 hover:bg-white/5">
-                  <td className="py-2">{req.reason}</td>
-                  <td className="py-2">{req.status}</td>
-                  <td className="py-2">
-                    {req.date || new Date(req.id).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </DashboardLayout>
+        <button
+          type="submit"
+          className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded transition"
+        >
+          Save Changes
+        </button>
+      </form>
+    </div>
   );
 }

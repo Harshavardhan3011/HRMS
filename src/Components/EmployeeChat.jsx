@@ -1,66 +1,96 @@
-// src/Components/EmployeeChat.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DashboardLayout from "../Pages/DashboardLayout";
-import { db } from "../firebaseConfig";
-import { ref, push, onValue } from "firebase/database"; 
 
 export default function EmployeeChat() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const user = JSON.parse(localStorage.getItem("user"));
+  const messagesEndRef = useRef(null);
 
-  // Fetch messages from Firebase
+  // Scroll to bottom when messages update
   useEffect(() => {
-    const messagesRef = ref(db, "chatMessages");
-    onValue(messagesRef, (snapshot) => {
-      const data = snapshot.val() || {};
-      const msgs = Object.values(data);
-      setMessages(msgs);
-    });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  // Fetch messages from API on mount
+  useEffect(() => {
+    async function fetchMessages() {
+      try {
+        const res = await fetch("/api/chat/messages");
+        const data = await res.json();
+        setMessages(data || []);
+      } catch (error) {
+        console.error("Failed to fetch messages:", error);
+      }
+    }
+    fetchMessages();
+
+    // Optional: implement WebSocket here for real-time updates
   }, []);
 
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!text.trim()) return;
 
-    await push(ref(db, "chatMessages"), {
+    const newMessage = {
       sender: user.email,
-      text,
+      text: text.trim(),
       timestamp: new Date().toLocaleString(),
-    });
+    };
 
-    setText("");
+    try {
+      const res = await fetch("/api/chat/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newMessage),
+      });
+      if (res.ok) {
+        setMessages((prev) => [...prev, newMessage]);
+        setText("");
+      } else {
+        alert("Failed to send message");
+      }
+    } catch (error) {
+      alert("Failed to send message: " + error.message);
+    }
   };
 
   return (
     <DashboardLayout>
-      <h1 className="text-3xl font-bold mb-4">Employee Chat</h1>
+      <h1 className="text-3xl font-bold mb-6 text-green-400">Employee Chat</h1>
 
-      <div className="bg-white/10 p-6 rounded-lg h-96 overflow-y-auto mb-4">
+      <div className="bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#020617] p-6 rounded-lg h-96 overflow-y-auto mb-4 text-white shadow-lg flex flex-col">
+        {messages.length === 0 && (
+          <p className="text-gray-500 text-center mt-20">No messages yet. Say Hi!</p>
+        )}
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            className={`mb-2 ${
-              msg.sender === user.email ? "text-green-400" : "text-white"
+            className={`mb-3 max-w-[80%] p-3 rounded-lg break-words self-start ${
+              msg.sender === user.email ? "bg-green-600 self-end text-white" : "bg-gray-700 text-green-400"
             }`}
           >
-            <strong>{msg.sender}:</strong> {msg.text}
-            <div className="text-xs text-gray-400">{msg.timestamp}</div>
+            <div className="font-semibold mb-1 truncate">{msg.sender}</div>
+            <div>{msg.text}</div>
+            <div className="text-xs text-gray-300 mt-1 text-right">{msg.timestamp}</div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={sendMessage} className="flex gap-2">
+      <form onSubmit={sendMessage} className="flex gap-3">
         <input
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Type a message..."
-          className="flex-grow px-4 py-2 rounded bg-white/10 border border-white/30 text-white"
+          className="flex-grow px-4 py-3 rounded-lg bg-gray-900 border border-green-600 text-green-300 placeholder-green-500 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         <button
           type="submit"
-          className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white font-semibold"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition"
         >
           Send
         </button>

@@ -1,60 +1,41 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./Components/Login";
+
+import DashboardLayout from "./Pages/DashboardLayout";
 import AdminDashboard from "./Pages/AdminDashboard";
-import HRDashboard from "./Pages/HRDashboard";
-import EmployeeDashboard from "./Pages/EmployeeDashboard";
-import ProtectedRoute from "./Components/ProtectedRoute";
-import ForgotPassword from './Components/ForgotPassword';
-import ProfilePage from './Components/ProfilePage';
-import EmployeeChat from './Components/EmployeeChat';
+import ProfilePage from "./Components/ProfilePage";
+import EmployeeChat from "./Components/EmployeeChat";
+import ResetPassword from "./Components/ResetPassword";
+import AdminAttendance from "./Components/AdminAttendance";
+import AdminPayroll from "./Components/AdminPayroll";
+import Login from "./Components/Login";
 
 export default function App() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const role = user?.role?.toLowerCase();
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        <Route path={`/${role}-dashboard`} element={<DashboardLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="attendance" element={<AdminAttendance />} />
+          <Route path="payroll" element={<AdminPayroll />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="chat" element={<EmployeeChat />} />
+          <Route path="reset-password" element={<ResetPassword />} />
+        </Route>
 
         <Route
-          path="/admin-dashboard"
+          path="*"
           element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hr-dashboard"
-          element={
-            <ProtectedRoute allowedRoles={["HR"]}>
-              <HRDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/employee-dashboard"
-          element={
-            <ProtectedRoute allowedRoles={["employee"]}>
-              <EmployeeDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/employee/chat"
-          element={
-            <ProtectedRoute allowedRoles={["employee"]}>
-              <EmployeeChat />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute allowedRoles={["admin", "HR", "employee"]}>
-              <ProfilePage />
-            </ProtectedRoute>
+            user ? (
+              <Navigate to={`/${role}-dashboard`} replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
       </Routes>

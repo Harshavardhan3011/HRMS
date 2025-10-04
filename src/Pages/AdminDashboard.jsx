@@ -1,97 +1,103 @@
-// src/Pages/AdminDashboard.jsx
-import React, { useState, useEffect } from "react";
-import DashboardLayout from "./DashboardLayout";
-import EmployeeTable from "../Components/Employeetable";
-import EmployeeForm from "../Components/EmployeeForm";
-import RequestManager from "../Components/RequestManager";
-import { db } from "../firebaseConfig";
-import { ref, onValue, push } from "firebase/database";
+import React, { useEffect, useState } from "react";
+import { UserGroupIcon, ClipboardDocumentListIcon, ClockIcon } from "@heroicons/react/24/outline";
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip as ChartTooltip,
+  ResponsiveContainer,
+} from "recharts";
 
-export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [employeeCount, setEmployeeCount] = useState(0);
-  const [pendingRequests, setPendingRequests] = useState(0);
+const mockUsers = [
+  { id: "1", name: "Alice Admin", email: "admin@example.com", role: "Admin" },
+  { id: "2", name: "Harry HR", email: "hr@example.com", role: "HR" },
+  { id: "3", name: "Eve Employee", email: "employee@example.com", role: "Employee" },
+];
 
-  // Fetch counts dynamically
-  useEffect(() => {
-    // Count employees
-    const employeesRef = ref(db, "employees");
-    onValue(employeesRef, (snapshot) => {
-      const data = snapshot.val() || {};
-      setEmployeeCount(Object.keys(data).length);
-    });
+const monthlyTrends = [
+  { month: "Jan", employees: 10, leaveRequests: 5 },
+  { month: "Feb", employees: 15, leaveRequests: 8 },
+  { month: "Mar", employees: 20, leaveRequests: 6 },
+  { month: "Apr", employees: 22, leaveRequests: 7 },
+  { month: "May", employees: 25, leaveRequests: 4 },
+];
 
-    // Count pending requests
-    const requestsRef = ref(db, "leaveRequests");
-    onValue(requestsRef, (snapshot) => {
-      const data = snapshot.val() || {};
-      const pending = Object.values(data).filter(
-        (req) => req.status === "Pending"
-      ).length;
-      setPendingRequests(pending);
-    });
-  }, []);
-
-  // Handle adding employee to Firebase
-  const handleAddEmployee = (employee) => {
-    push(ref(db, "employees"), employee)
-      .then(() => alert("Employee added successfully!"))
-      .catch((err) => alert("Error adding employee: " + err.message));
-  };
-
+function DashboardCard({ title, value, icon: Icon, colorClass, tooltipText }) {
   return (
-    <DashboardLayout>
-      <h1 className="text-3xl md:text-4xl font-bold mb-6">Admin Dashboard</h1>
-
-      {/* Tab Buttons */}
-      <div className="flex gap-4 mb-8">
-        {["dashboard", "employees", "requests"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded font-semibold ${
-              activeTab === tab
-                ? "bg-indigo-600 text-white"
-                : "bg-white/10 hover:bg-white/20"
-            }`}
-          >
-            {tab === "dashboard"
-              ? "Overview"
-              : tab === "employees"
-              ? "Manage Employees"
-              : "Manage Requests"}
-          </button>
-        ))}
-      </div>
-
-      {/* Overview Cards */}
-      {activeTab === "dashboard" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-          <DashboardCard title="Total Employees" value={employeeCount} />
-          <DashboardCard title="HR Members" value="3" />
-          <DashboardCard title="Pending Requests" value={pendingRequests} />
-        </div>
-      )}
-
-      {/* Employee Management */}
-      {activeTab === "employees" && (
-        <div className="space-y-6">
-          <EmployeeTable />
-          <EmployeeForm onSubmit={handleAddEmployee} />
-        </div>
-      )}
-
-      {/* Leave Requests */}
-      {activeTab === "requests" && <RequestManager />}
-    </DashboardLayout>
+    <div
+      title={tooltipText}
+      className={`bg-white/10 p-6 rounded-lg shadow-md text-center hover:bg-white/20 transition cursor-default`}
+    >
+      <Icon className={`mx-auto h-10 w-10 mb-3 ${colorClass}`} />
+      <h3 className="text-xl font-semibold mb-2 text-green-300">{title}</h3>
+      <p className="text-4xl font-extrabold text-white">{value}</p>
+    </div>
   );
 }
 
-function DashboardCard({ title, value }) {
+export default function AdminDashboard() {
+  const [employees, setEmployees] = useState([]);
+
+  useEffect(() => {
+    setEmployees(mockUsers);
+  }, []);
+
+  const hrCount = employees.filter((emp) => emp.role === "HR").length;
+  const pendingRequests = 3; // Mock number
+  const todayAttendanceCount = 20; // Mock number
+
   return (
-    <div className="bg-white/10 p-6 rounded-lg shadow text-center hover:bg-white/20 transition">
-      <h3 className="text-lg font-medium">{title}</h3>
-      <p className="text-3xl font-bold mt-2">{value}</p>
+    <div>
+      <h1 className="text-4xl font-extrabold mb-8 text-green-400">Admin Dashboard</h1>
+
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        <DashboardCard
+          title="Total Employees"
+          value={employees.length}
+          icon={UserGroupIcon}
+          colorClass="text-green-400"
+          tooltipText="Total number of employees"
+        />
+        <DashboardCard
+          title="HR Members"
+          value={hrCount}
+          icon={UserGroupIcon}
+          colorClass="text-green-500"
+          tooltipText="Number of HR department employees"
+        />
+        <DashboardCard
+          title="Pending Requests"
+          value={pendingRequests}
+          icon={ClipboardDocumentListIcon}
+          colorClass="text-red-400"
+          tooltipText="Number of leave requests pending approval"
+        />
+        <DashboardCard
+          title="Today's Attendance"
+          value={todayAttendanceCount}
+          icon={ClockIcon}
+          colorClass="text-yellow-400"
+          tooltipText="Employees clocked in today"
+        />
+      </div>
+
+      {/* Trends Chart */}
+      <div className="bg-white/10 p-6 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-semibold text-green-400 mb-4">Monthly Trends</h2>
+        <ResponsiveContainer width="100%" height={250}>
+          <LineChart data={monthlyTrends} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+            <CartesianGrid stroke="#2f855a" strokeDasharray="3 3" />
+            <XAxis dataKey="month" stroke="#68d391" />
+            <YAxis stroke="#68d391" />
+            <ChartTooltip contentStyle={{ backgroundColor: "#0f172a", borderRadius: 8 }} />
+            <Line type="monotone" dataKey="employees" stroke="#48bb78" strokeWidth={3} activeDot={{ r: 8 }} />
+            <Line type="monotone" dataKey="leaveRequests" stroke="#f56565" strokeWidth={3} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

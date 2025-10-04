@@ -1,4 +1,3 @@
-// src/Pages/EmployeeRequests.jsx
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "../Pages/DashboardLayout";
 
@@ -12,18 +11,30 @@ export default function EmployeeRequests() {
 
   return (
     <DashboardLayout>
-      <h1 className="text-3xl font-bold mb-4">My Leave Requests</h1>
+      <h1 className="text-3xl font-bold mb-6 text-green-400">My Leave Requests</h1>
       {requests.length === 0 ? (
-        <p className="text-gray-400">No leave requests submitted yet.</p>
+        <p className="text-gray-400 italic text-center py-10">
+          No leave requests submitted yet.
+        </p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="divide-y divide-white/20 border border-white/20 rounded-md max-w-3xl mx-auto">
           {requests.map((req) => (
             <li
               key={req.id}
-              className="flex justify-between border-b border-white/20 py-2"
+              className="flex justify-between px-6 py-4 text-white hover:bg-white/10 transition cursor-pointer"
             >
               <span>{req.reason}</span>
-              <span className="text-sm text-gray-300">{req.status}</span>
+              <span
+                className={`text-sm font-semibold ${
+                  req.status.toLowerCase() === "approved"
+                    ? "text-green-400"
+                    : req.status.toLowerCase() === "pending"
+                    ? "text-yellow-400"
+                    : "text-red-400"
+                }`}
+              >
+                {req.status}
+              </span>
             </li>
           ))}
         </ul>

@@ -1,3 +1,4 @@
+// HRDashboard.jsx
 import React from "react";
 import DashboardLayout from "./DashboardLayout";
 import EmployeeTable from "../Components/Employeetable";
@@ -5,9 +6,12 @@ import EmployeeTable from "../Components/Employeetable";
 export default function HRDashboard() {
   return (
     <DashboardLayout>
-      <h1 className="text-3xl font-bold mb-4">HR Dashboard</h1>
-      <p className="text-gray-300 mb-6">Here’s a list of all employees.</p>
+      <h1 className="text-4xl font-extrabold mb-6 text-green-400">HR Dashboard</h1>
+      <p className="text-green-300">
+        HR team tools like employee list and requests.
+      </p>
       <EmployeeTable />
+      {/* HR specific components */}
     </DashboardLayout>
   );
 }

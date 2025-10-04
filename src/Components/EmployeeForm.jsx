@@ -1,7 +1,5 @@
-// src/Components/EmployeeForm.jsx
 import React, { useState } from "react";
-import { db } from "../firebaseConfig";
-import { push, ref } from "firebase/database";
+
 
 export default function EmployeeForm() {
   const [employee, setEmployee] = useState({
@@ -34,41 +32,43 @@ export default function EmployeeForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white/10 p-6 rounded-lg mt-8 space-y-4"
+      className="bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#020617] p-8 rounded-xl mt-10 max-w-md mx-auto space-y-6 shadow-lg text-white"
     >
-      <h2 className="text-2xl font-semibold mb-4">Add New Employee</h2>
+      <h2 className="text-3xl font-extrabold mb-6 border-b border-green-600 pb-2 text-green-400">
+        Add New Employee
+      </h2>
 
       <div>
-        <label className="block text-sm mb-1">Name</label>
+        <label className="block text-green-400 text-sm mb-1 font-semibold">Name</label>
         <input
           type="text"
           name="name"
           value={employee.name}
           onChange={handleChange}
-          className="w-full px-4 py-2 rounded bg-white/10 border border-white/30 text-white"
+          className="w-full px-4 py-3 rounded border border-green-600 bg-gray-900 placeholder-green-600 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm mb-1">Email</label>
+        <label className="block text-green-400 text-sm mb-1 font-semibold">Email</label>
         <input
           type="email"
           name="email"
           value={employee.email}
           onChange={handleChange}
-          className="w-full px-4 py-2 rounded bg-white/10 border border-white/30 text-white"
+          className="w-full px-4 py-3 rounded border border-green-600 bg-gray-900 placeholder-green-600 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm mb-1">Role</label>
+        <label className="block text-green-400 text-sm mb-1 font-semibold">Role</label>
         <select
           name="role"
           value={employee.role}
           onChange={handleChange}
-          className="w-full px-4 py-2 rounded bg-white/10 border border-white/30 text-white"
+          className="w-full px-4 py-3 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
         >
           <option value="Admin">Admin</option>
           <option value="HR">HR</option>
@@ -78,7 +78,7 @@ export default function EmployeeForm() {
 
       <button
         type="submit"
-        className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white font-semibold"
+        className="bg-green-600 hover:bg-green-700 transition text-white px-6 py-3 rounded font-semibold w-full"
       >
         Add Employee
       </button>
