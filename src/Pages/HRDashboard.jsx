@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import EmployeeTable from "../Components/Employeetable";
+import EmployeeTable from "../Components/EmployeeTable";
 
 
 const mockEmployees = [
