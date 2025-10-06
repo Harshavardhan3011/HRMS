@@ -1,174 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
-const mockProfiles = {
-  admin: {
-    id: "1",
+export default function ProfilePage() {
+  const [form, setForm] = useState({
     name: "Alice Admin",
     phone: "123-456-7890",
     department: "Administration",
     joinDate: "2020-01-15",
     photoURL: "https://i.pravatar.cc/150?img=1",
-    role: "Admin",
-  },
-  hr: {
-    id: "2",
-    name: "Henry HR",
-    phone: "987-654-3210",
-    department: "Human Resources",
-    joinDate: "2019-05-23",
-    photoURL: "https://i.pravatar.cc/150?img=2",
-    role: "HR",
-  },
-  employee: {
-    id: "3",
-    name: "Emma Employee",
-    phone: "555-123-4567",
-    department: "Development",
-    joinDate: "2021-08-10",
-    photoURL: "https://i.pravatar.cc/150?img=3",
-    role: "Employee",
-  },
-};
-
-export default function ProfilePage() {
-  const [user, setUser] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    department: "",
-    joinDate: "",
-    photoURL: "",
+    email: "admin@company.com"
   });
-  const [message, setMessage] = useState("");
+  const [msg, setMsg] = useState("");
+  const [imagePreview, setImagePreview] = useState(form.photoURL);
 
-  useEffect(() => {
-    // Simulate retrieving logged-in user from localStorage
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-    if (savedUser && savedUser.role) {
-      setUser(savedUser);
-      const profile = mockProfiles[savedUser.role.toLowerCase()] || mockProfiles.employee;
-      setFormData({
-        name: profile.name,
-        phone: profile.phone,
-        department: profile.department,
-        joinDate: profile.joinDate,
-        photoURL: profile.photoURL,
-      });
-    } else {
-      setUser(null);
-      setFormData({
-        name: "",
-        phone: "",
-        department: "",
-        joinDate: "",
-        photoURL: "",
-      });
-    }
-  }, []);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleImageUpload = (e) => {
+    if (!e.target.files?.[0]) return;
+    setImagePreview(URL.createObjectURL(e.target.files[0]));
   };
 
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const handleSave = (e) => {
     e.preventDefault();
-    if (!formData.name) {
-      setMessage("Name is required.");
-      return;
-    }
-    // In a real app, save the formData to backend here
-    setMessage("Profile updated successfully (mock).");
+    setMsg("Profile updated!");
+    setTimeout(() => setMsg(""), 2000);
   };
 
-  if (!user) {
-    return <p className="text-gray-400 text-center py-10">No user logged in.</p>;
-  }
-
   return (
-    <div className="max-w-3xl mx-auto bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#020617] p-8 rounded-xl shadow-lg text-white">
-      <h1 className="text-4xl font-extrabold mb-6">My Profile ({user.role})</h1>
-      {message && (
-        <p className={`mb-6 ${message.startsWith("Error") ? "text-red-500" : "text-green-400"}`}>
-          {message}
-        </p>
-      )}
-      <form onSubmit={handleSave} className="space-y-6">
-        {/* form inputs same as before */}
+    <div className="max-w-3xl mx-auto bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-8 rounded-xl shadow-lg text-white flex flex-col gap-8">
+      <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="profile-avatar-upload" />
+        <label htmlFor="profile-avatar-upload" className="cursor-pointer">
+          <img src={imagePreview} alt="Profile" className="rounded-full h-36 w-36 border-4 border-green-600 shadow-lg object-cover bg-gray-900" />
+          <span className="block text-green-400 text-center mt-2 underline">Change Photo</span>
+        </label>
         <div>
-          <label htmlFor="name" className="block mb-1 font-semibold">
-            Name
-          </label>
-          <input
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          />
+          <h1 className="text-3xl md:text-4xl font-extrabold mb-2 break-all">{form.name}</h1>
+          <div className="mb-1 text-green-400 font-semibold capitalize">Admin</div>
+          <div className="mb-1 text-green-200 break-all"><span className="font-bold">Email:</span> {form.email}</div>
+          <div className="mb-1 text-green-300 font-bold">Department: {form.department}</div>
+          <div className="mb-1 text-green-300 font-bold">Joined: {new Date(form.joinDate).toLocaleDateString()}</div>
         </div>
-        {/* more fields: phone, department, joinDate, photoURL (same as your original code) */}
-        {/* Phone */}
-        <div>
-          <label htmlFor="phone" className="block mb-1 font-semibold">
-            Phone
-          </label>
-          <input
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-        </div>
-        {/* Department */}
-        <div>
-          <label htmlFor="department" className="block mb-1 font-semibold">
-            Department
-          </label>
-          <input
-            id="department"
-            name="department"
-            value={formData.department}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-        </div>
-        {/* Join Date */}
-        <div>
-          <label htmlFor="joinDate" className="block mb-1 font-semibold">
-            Join Date
-          </label>
-          <input
-            id="joinDate"
-            name="joinDate"
-            type="date"
-            value={formData.joinDate}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-        </div>
-        {/* Photo URL */}
-        <div>
-          <label htmlFor="photoURL" className="block mb-1 font-semibold">
-            Photo URL
-          </label>
-          <input
-            id="photoURL"
-            name="photoURL"
-            value={formData.photoURL}
-            onChange={handleChange}
-            placeholder="https://example.com/photo.jpg"
-            className="w-full px-4 py-2 rounded border border-green-600 bg-gray-900 text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded transition"
-        >
-          Save Changes
-        </button>
+      </div>
+      <form onSubmit={handleSave} className="space-y-6 bg-black/20 p-6 rounded-xl mt-6">
+        <h2 className="text-2xl text-green-400 font-bold mb-2">Edit Profile</h2>
+        {msg && <p className="mb-4 text-center text-green-400">{msg}</p>}
+        <input name="name" value={form.name} onChange={handleChange} required className="w-full px-4 py-2 rounded border bg-gray-900 border-green-600 text-green-300" placeholder="Name" />
+        <input name="phone" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 rounded border bg-gray-900 border-green-600 text-green-300" placeholder="Phone" />
+        <input name="department" value={form.department} onChange={handleChange} className="w-full px-4 py-2 rounded border bg-gray-900 border-green-600 text-green-300" placeholder="Department" />
+        <input name="joinDate" type="date" value={form.joinDate} onChange={handleChange} className="w-full px-4 py-2 rounded border bg-gray-900 border-green-600 text-green-300" />
+        <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded transition w-full sm:w-auto">Save Changes</button>
       </form>
     </div>
   );

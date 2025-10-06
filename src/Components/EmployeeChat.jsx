@@ -58,7 +58,7 @@ export default function EmployeeChat() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <h1 className="text-3xl font-bold mb-6 text-green-400">Employee Chat</h1>
 
       <div className="bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#020617] p-6 rounded-lg h-96 overflow-y-auto mb-4 text-white shadow-lg flex flex-col">
@@ -95,6 +95,6 @@ export default function EmployeeChat() {
           Send
         </button>
       </form>
-    </DashboardLayout>
+    </>
   );
 }

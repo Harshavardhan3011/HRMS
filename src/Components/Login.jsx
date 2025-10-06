@@ -9,7 +9,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Mock users (frontend only, no API)
   const mockUsers = {
     admin: { email: "admin1@gmail.com", password: "admin@123" },
     hr: { email: "hr1@gmail.com", password: "hr@123" },
@@ -27,17 +26,11 @@ export default function Login() {
       return;
     }
 
-    const user = mockUsers[role]; // role matches directly now
+    const user = mockUsers[role];
     if (user && user.email === email && user.password === password) {
-      // Save safe mock user to localStorage
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ email: user.email, role })
-      );
-
+      localStorage.setItem("user", JSON.stringify({ email: user.email, role }));
       setLoading(false);
 
-      // Route based on role
       if (role === "admin") navigate("/admin-dashboard");
       else if (role === "hr") navigate("/hr-dashboard");
       else navigate("/employee-dashboard");
@@ -69,9 +62,15 @@ export default function Login() {
               required
             >
               <option value="">-- Select Role --</option>
-              <option value="admin" className="text-black">Admin</option>
-              <option value="hr" className="text-black">HR</option>
-              <option value="employee" className="text-black">Employee</option>
+              <option value="admin" className="text-black">
+                Admin
+              </option>
+              <option value="hr" className="text-black">
+                HR
+              </option>
+              <option value="employee" className="text-black">
+                Employee
+              </option>
             </select>
           </div>
 

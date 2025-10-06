@@ -1,35 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { UserGroupIcon, ClipboardDocumentListIcon, ClockIcon } from "@heroicons/react/24/outline";
 import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip as ChartTooltip,
-  ResponsiveContainer,
+  LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip as ChartTooltip, ResponsiveContainer,
 } from "recharts";
 
 const mockUsers = [
-  { id: "1", name: "Alice Admin", email: "admin@example.com", role: "Admin" },
-  { id: "2", name: "Harry HR", email: "hr@example.com", role: "HR" },
-  { id: "3", name: "Eve Employee", email: "employee@example.com", role: "Employee" },
+  { id: "1", name: "Alice Admin", email: "admin@company.com", role: "Admin" },
+  { id: "2", name: "John HR", email: "john.hr@company.com", role: "HR" },
+  { id: "3", name: "Bob Dev", email: "bob@company.com", role: "Employee" },
 ];
-
+const mockRequests = [
+  { id: "r1", user: "bob@company.com", status: "Pending", reason: "Medical leave" },
+  { id: "r2", user: "john.hr@company.com", status: "Pending", reason: "Family event" },
+  { id: "r3", user: "bob@company.com", status: "Pending", reason: "Vacation" }
+];
+const mockAttendance = [
+  { id: "a1", name: "Bob Dev", email: "bob@company.com", clockIn: "09:10", clockOut: "" },
+  { id: "a2", name: "John HR", email: "john.hr@company.com", clockIn: "09:15", clockOut: "" },
+  { id: "a3", name: "Alice Admin", email: "admin@company.com", clockIn: "08:57", clockOut: "17:10" }
+];
 const monthlyTrends = [
-  { month: "Jan", employees: 10, leaveRequests: 5 },
-  { month: "Feb", employees: 15, leaveRequests: 8 },
-  { month: "Mar", employees: 20, leaveRequests: 6 },
-  { month: "Apr", employees: 22, leaveRequests: 7 },
-  { month: "May", employees: 25, leaveRequests: 4 },
+  { month: 'Jan', employees: 10, leaveRequests: 5 },
+  { month: 'Feb', employees: 15, leaveRequests: 8 },
+  { month: 'Mar', employees: 20, leaveRequests: 6 },
+  { month: 'Apr', employees: 22, leaveRequests: 7 },
+  { month: 'May', employees: 25, leaveRequests: 4 },
 ];
 
-function DashboardCard({ title, value, icon: Icon, colorClass, tooltipText }) {
+function DashboardCard({ title, value, icon: Icon, colorClass }) {
   return (
-    <div
-      title={tooltipText}
-      className={`bg-white/10 p-6 rounded-lg shadow-md text-center hover:bg-white/20 transition cursor-default`}
-    >
+    <div className="bg-white/10 p-6 rounded-lg shadow-md text-center hover:bg-white/20 transition-all cursor-pointer select-none flex-1 min-w-[200px]">
       <Icon className={`mx-auto h-10 w-10 mb-3 ${colorClass}`} />
       <h3 className="text-xl font-semibold mb-2 text-green-300">{title}</h3>
       <p className="text-4xl font-extrabold text-white">{value}</p>
@@ -39,53 +39,21 @@ function DashboardCard({ title, value, icon: Icon, colorClass, tooltipText }) {
 
 export default function AdminDashboard() {
   const [employees, setEmployees] = useState([]);
-
-  useEffect(() => {
-    setEmployees(mockUsers);
-  }, []);
-
+  useEffect(() => setEmployees(mockUsers), []);
   const hrCount = employees.filter((emp) => emp.role === "HR").length;
-  const pendingRequests = 3; // Mock number
-  const todayAttendanceCount = 20; // Mock number
+  const pendingRequests = mockRequests.length;
+  const todayAttendanceCount = mockAttendance.length;
 
   return (
     <div>
       <h1 className="text-4xl font-extrabold mb-8 text-green-400">Admin Dashboard</h1>
-
-      {/* Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-        <DashboardCard
-          title="Total Employees"
-          value={employees.length}
-          icon={UserGroupIcon}
-          colorClass="text-green-400"
-          tooltipText="Total number of employees"
-        />
-        <DashboardCard
-          title="HR Members"
-          value={hrCount}
-          icon={UserGroupIcon}
-          colorClass="text-green-500"
-          tooltipText="Number of HR department employees"
-        />
-        <DashboardCard
-          title="Pending Requests"
-          value={pendingRequests}
-          icon={ClipboardDocumentListIcon}
-          colorClass="text-red-400"
-          tooltipText="Number of leave requests pending approval"
-        />
-        <DashboardCard
-          title="Today's Attendance"
-          value={todayAttendanceCount}
-          icon={ClockIcon}
-          colorClass="text-yellow-400"
-          tooltipText="Employees clocked in today"
-        />
+        <DashboardCard title="Total Employees" value={employees.length} icon={UserGroupIcon} colorClass="text-green-400" />
+        <DashboardCard title="HR Members" value={hrCount} icon={UserGroupIcon} colorClass="text-green-500" />
+        <DashboardCard title="Pending Requests" value={pendingRequests} icon={ClipboardDocumentListIcon} colorClass="text-red-400" />
+        <DashboardCard title="Today's Attendance" value={todayAttendanceCount} icon={ClockIcon} colorClass="text-yellow-400" />
       </div>
-
-      {/* Trends Chart */}
-      <div className="bg-white/10 p-6 rounded-lg shadow-lg">
+      <div className="bg-white/10 p-6 rounded-lg shadow-lg mt-8">
         <h2 className="text-2xl font-semibold text-green-400 mb-4">Monthly Trends</h2>
         <ResponsiveContainer width="100%" height={250}>
           <LineChart data={monthlyTrends} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
