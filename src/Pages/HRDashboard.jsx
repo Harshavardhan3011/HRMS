@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import EmployeeTable from "../Components/EmployeeTable";
 
+
 const mockEmployees = [
   { id: "1", name: "Alice Admin", email: "alice@company.com", role: "Employee", department: "Development", joinDate: "2023-06-18" },
   { id: "2", name: "John HR", email: "john.hr@company.com", role: "HR", department: "Human Resources", joinDate: "2020-01-23" },
